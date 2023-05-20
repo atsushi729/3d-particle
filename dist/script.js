@@ -3,7 +3,7 @@ class Stage {
     this.renderParam = {
       clearColor: 0x000000,
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
     this.cameraParam = {
       fov: 45,
@@ -12,7 +12,7 @@ class Stage {
       lookAt: new THREE.Vector3(0, 0, 0),
       x: 0,
       y: 0.5,
-      z: 4
+      z: 4,
     };
 
     this.scene = null;
@@ -44,6 +44,7 @@ class Stage {
     wrapper.appendChild(this.renderer.domElement);
   }
 
+  // Camera
   _setCamera() {
     if (!this.isInitialized) {
       this.camera = new THREE.PerspectiveCamera(
@@ -112,27 +113,53 @@ class Mesh {
       const normal = new THREE.Vector3();
 
       sampler.sample(newPosition, normal);
-      particlesPosition.set([newPosition.x, newPosition.y, newPosition.z],i * 3);
+      particlesPosition.set(
+        [newPosition.x, newPosition.y, newPosition.z],
+        i * 3
+      );
     }
 
     return particlesPosition;
   }
 
+  // Set Geometry
   _setMesh() {
     const geometry = new THREE.BufferGeometry();
-    const firstPos = this._getGeometryPosition(new THREE.SphereBufferGeometry(1, 32, 32).toNonIndexed());
-    const secPos = this._getGeometryPosition(new THREE.TorusBufferGeometry(0.7, 0.3, 32, 32).toNonIndexed());
-    const thirdPos = this._getGeometryPosition(new THREE.TorusKnotBufferGeometry(0.6, 0.25, 300, 20, 6, 10).toNonIndexed());
-    const forthPos = this._getGeometryPosition(new THREE.CylinderBufferGeometry(1, 1, 1, 32, 32).toNonIndexed());
-    const fivePos = this._getGeometryPosition(new THREE.IcosahedronBufferGeometry(1.1, 0).toNonIndexed());
+    const firstPos = this._getGeometryPosition(
+      new THREE.SphereBufferGeometry(1, 32, 32).toNonIndexed()
+    );
+    const secPos = this._getGeometryPosition(
+      new THREE.TorusBufferGeometry(0.7, 0.3, 32, 32).toNonIndexed()
+    );
+    const thirdPos = this._getGeometryPosition(
+      new THREE.TorusKnotBufferGeometry(
+        0.6,
+        0.25,
+        300,
+        20,
+        6,
+        10
+      ).toNonIndexed()
+    );
+    const forthPos = this._getGeometryPosition(
+      new THREE.CylinderBufferGeometry(1, 1, 1, 32, 32).toNonIndexed()
+    );
+    const fivePos = this._getGeometryPosition(
+      new THREE.IcosahedronBufferGeometry(1.1, 0).toNonIndexed()
+    );
     const material = new THREE.RawShaderMaterial({
       vertexShader: document.querySelector("#js-vertex-shader").textContent,
-      fragmentShader: document.querySelector("#js-fragment-shader").textContent,
+      fragmentShader: `
+    precision mediump float;
+    void main() {
+      gl_FragColor = vec4(0/255, 255/255, 0/255, 1.0); // Set mesh color
+    }
+  `,
       uniforms: {
         u_sec1: { type: "f", value: 0.0 },
         u_sec2: { type: "f", value: 0.0 },
         u_sec3: { type: "f", value: 0.0 },
-        u_sec4: { type: "f", value: 0.0 }
+        u_sec4: { type: "f", value: 0.0 },
       },
       transparent: true,
       blending: THREE.AdditiveBlending,
@@ -140,32 +167,45 @@ class Mesh {
 
     geometry.setAttribute("position", new THREE.BufferAttribute(firstPos, 3));
     geometry.setAttribute("secPosition", new THREE.BufferAttribute(secPos, 3));
-    geometry.setAttribute("thirdPosition", new THREE.BufferAttribute(thirdPos, 3));
-    geometry.setAttribute("forthPosition", new THREE.BufferAttribute(forthPos, 3));
-    geometry.setAttribute("fivePosition",new THREE.BufferAttribute(fivePos, 3));
+    geometry.setAttribute(
+      "thirdPosition",
+      new THREE.BufferAttribute(thirdPos, 3)
+    );
+    geometry.setAttribute(
+      "forthPosition",
+      new THREE.BufferAttribute(forthPos, 3)
+    );
+    geometry.setAttribute(
+      "fivePosition",
+      new THREE.BufferAttribute(fivePos, 3)
+    );
 
+    // Create mesh
     this.mesh = new THREE.Points(geometry, material);
 
+    // Create group
     this.group = new THREE.Group();
     this.group.add(this.mesh);
 
+    // Add to scene
     this.stage.scene.add(this.group);
   }
 
   _setScroll() {
-    gsap.timeline({
+    gsap
+      .timeline({
         defaults: {},
         scrollTrigger: {
           trigger: "body",
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.7
-        }
+          scrub: 0.7,
+        },
       })
       .to(this.mesh.rotation, {
         x: Math.PI * 2,
         y: Math.PI * 2,
-        z: Math.PI * 2
+        z: Math.PI * 2,
       });
 
     gsap.to(this.mesh.material.uniforms.u_sec1, {
@@ -174,8 +214,8 @@ class Mesh {
         trigger: ".s-1",
         start: "bottom bottom",
         end: "bottom top",
-        scrub: 0.7
-      }
+        scrub: 0.7,
+      },
     });
     gsap.to(this.mesh.material.uniforms.u_sec2, {
       value: 1.0,
@@ -183,8 +223,8 @@ class Mesh {
         trigger: ".s-2",
         start: "bottom bottom",
         end: "bottom top",
-        scrub: 0.7
-      }
+        scrub: 0.7,
+      },
     });
     gsap.to(this.mesh.material.uniforms.u_sec3, {
       value: 1.0,
@@ -192,8 +232,8 @@ class Mesh {
         trigger: ".s-3",
         start: "bottom bottom",
         end: "bottom top",
-        scrub: 0.7
-      }
+        scrub: 0.7,
+      },
     });
     gsap.to(this.mesh.material.uniforms.u_sec4, {
       value: 1.0,
@@ -201,8 +241,8 @@ class Mesh {
         trigger: ".s-4",
         start: "bottom bottom",
         end: "bottom top",
-        scrub: 0.7
-      }
+        scrub: 0.7,
+      },
     });
   }
 
