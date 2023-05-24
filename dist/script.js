@@ -1,3 +1,6 @@
+// import fragment from "./fragment"
+
+
 class Stage {
   constructor() {
     this.renderParam = {
@@ -150,11 +153,11 @@ class Mesh {
     const material = new THREE.RawShaderMaterial({
       vertexShader: document.querySelector("#js-vertex-shader").textContent,
       fragmentShader: `
-    precision mediump float;
-    void main() {
-      gl_FragColor = vec4(0/255, 255/255, 0/255, 1.0); // Set mesh color
-    }
-  `,
+      precision mediump float;
+
+      void main() {
+          gl_FragColor = vec4(0/255, 255/255, 0/255, 1.0); // Set mesh color
+      }`,
       uniforms: {
         u_sec1: { type: "f", value: 0.0 },
         u_sec2: { type: "f", value: 0.0 },
