@@ -1,6 +1,5 @@
 // import fragment from "./fragment"
 
-
 class Stage {
   constructor() {
     this.renderParam = {
